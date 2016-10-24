@@ -7,14 +7,14 @@ import {
 const m = prepareForTests(__filename);
 
 executeTests("Maybe implementation", [{
-    name: "flow()",
+    name: "maybeFlow()",
     assertions: [{
         when: "called with no input",
         should: "return a function that returns an empty array",
         test: (test) => test(function(t) {
             const testedModule = m({});
             t.equal(
-                testedModule.flow()().isMaybe,
+                testedModule.maybeFlow()().isMaybe,
                 true
             );
             t.end();

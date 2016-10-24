@@ -1,8 +1,7 @@
 import {
-    flow
+    maybeFlow
 } from "./maybe.js";
 
-const maybeFlow = flow;
 
 export {
     maybeFlow

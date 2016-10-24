@@ -60,7 +60,7 @@ function newMaybe(input) {
     return internalMaybe.of(input);
 }
 
-function flow(...fns) {
+function maybeFlow(...fns) {
     const applier = (input) => fns.reduce(
         (prev, curr) => prev.map(curr), newMaybe(input)
     );
@@ -69,5 +69,5 @@ function flow(...fns) {
 }
 
 export {
-    flow
+    maybeFlow
 };
