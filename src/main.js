@@ -1,5 +1,9 @@
-import maybe from "./maybe.js";
+import {
+    flow
+} from "./maybe.js";
+
+const maybeFlow = flow;
 
 export {
-    maybe
+    maybeFlow
 };
