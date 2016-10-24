@@ -68,4 +68,6 @@ function flow(...fns) {
     return applier;
 }
 
-export default flow;
+export {
+    flow
+};

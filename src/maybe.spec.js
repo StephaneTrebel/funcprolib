@@ -1,26 +1,23 @@
-import path from "path";
-
 import {
     executeTests,
-    prepareForTests,
-    utilityFunctions
-} from path.resolve("tests/unit-tests.js");
+    prepareForTests /*,
+    utilityFunctions*/
+} from "../tests/unit-tests.js";
 
 const m = prepareForTests(__filename);
 
 executeTests("Maybe implementation", [{
-    name: "addMiddlewares()",
+    name: "flow()",
     assertions: [{
-        when: "there is an error",
-        should: "return a rejected Promise",
-        test: (test) => test((t) =>
-            m({
-                middlewares: {
-                    loadMiddlewares: utilityFunctions.rejectFn
-                }
-            })
-            .addMiddlewares()
-            .catch(() => t.pass(""))
-        )
+        when: "called with no input",
+        should: "return a function that returns an empty array",
+        test: (test) => test(function(t) {
+            const testedModule = m({});
+            t.equal(
+                testedModule.flow()().isMaybe,
+                true
+            );
+            t.end();
+        })
     }]
 }]);

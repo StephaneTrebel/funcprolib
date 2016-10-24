@@ -8,12 +8,12 @@ const {
     utilityFunctions
 } = require("semtest");
 
-const modulePath = (p) => path.join(path.resolve(__dirname, "../src"), p);
+const modulePath = (p) => path.join(path.resolve(__dirname, "../dist"), p);
 
 const projectModuleNames = {
     lodash: "lodash/fp",
 
-    maybe: modulePath("src/maybe")
+    maybe: modulePath("maybe")
 };
 
 const projectStubs = {
