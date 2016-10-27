@@ -38,7 +38,7 @@ function createEither(input) {
     newEither.ifLeft = function(input) {
         if (newEither.isLeft()) {
             if (isFunction(input)) {
-                return input();
+                return input(newEither.left);
             }
             return input;
         }
