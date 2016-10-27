@@ -144,13 +144,13 @@ executeTests("Either implementation", [{
         })
     }, {
         when: "a Either(Left()) has its ifLeft method called with a function",
-        should: "return the result of given function called without any parameter",
+        should: "return the application of given function on the Left() value",
         test: (test) => test(function(t) {
             const testedModule = m({});
-            const either = testedModule.createEither();
+            const either = testedModule.createEither(new Error("DERP"));
             t.equal(
-                either.ifLeft(() => "foo"),
-                "foo"
+                either.ifLeft((e) => e.toString()),
+                "Error: DERP"
             );
             t.end();
         })
