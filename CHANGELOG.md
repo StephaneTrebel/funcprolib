@@ -3,6 +3,8 @@ Highest priority:
 Normal priority:
 
 [NEXT VERSION]
+
+[1.1.0]
 - [FEATURE]: Add an Either implementation
 
 [1.0.0]
