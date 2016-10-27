@@ -1,6 +1,8 @@
 import {
     isError,
-    isFunction
+    isFunction,
+    isNull,
+    isUndefined
 } from "lodash/fp";
 
 function createMaybe(input) {
@@ -10,24 +12,21 @@ function createMaybe(input) {
         if (input && input.isMaybe) {
             return input;
         }
-        if (isError(input)) {
-            return newMaybe.of();
+        if (isError(input) || isNull(input) || Number.isNaN(input) || isUndefined(input)) {
+            newMaybe.value = input;
+            newMaybe.hasNothing = true;
+            return newMaybe;
         }
         if (isFunction(input)) {
             return newMaybe.map(input);
         }
         newMaybe.value = input;
-
-        if (newMaybe.value) {
-            newMaybe.isNothing = false;
-        } else {
-            newMaybe.isNothing = true;
-        }
         return newMaybe;
     };
-    newMaybe.toString = () => `Maybe(${newMaybe.isNothing ? "Nothing" : newMaybe.value})`;
+    newMaybe.toString = () => `Maybe(${newMaybe.isNothing() ? "Nothing" : newMaybe.value})`;
+    newMaybe.isNothing = () => !!newMaybe.hasNothing;
     newMaybe.map = function(fn) {
-        if (newMaybe.isNothing) {
+        if (newMaybe.isNothing()) {
             return newMaybe;
         }
         try {
@@ -37,7 +36,7 @@ function createMaybe(input) {
         }
     };
     newMaybe.orElse = function(input) {
-        if (newMaybe.isNothing) {
+        if (newMaybe.isNothing()) {
             if (isFunction(input)) {
                 return input();
             }

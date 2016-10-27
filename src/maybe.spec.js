@@ -14,7 +14,7 @@ executeTests("Maybe implementation", [{
         test: (test) => test(function(t) {
             const testedModule = m({});
             t.equal(
-                testedModule.createMaybe().isNothing,
+                testedModule.createMaybe().isNothing(),
                 true
             );
             t.end();
@@ -24,9 +24,9 @@ executeTests("Maybe implementation", [{
         should: "return a Maybe(Nothing)",
         test: (test) => test(function(t) {
             const testedModule = m({});
-            t.equal(testedModule.createMaybe(null).isNothing, true, "Ok for null");
-            t.equal(testedModule.createMaybe(undefined).isNothing, true, "Ok for undefined");
-            t.equal(testedModule.createMaybe(NaN).isNothing, true, "Ok for NaN");
+            t.equal(testedModule.createMaybe(null).isNothing(), true, "Ok for null");
+            t.equal(testedModule.createMaybe(undefined).isNothing(), true, "Ok for undefined");
+            t.equal(testedModule.createMaybe(NaN).isNothing(), true, "Ok for NaN");
             t.end();
         })
     }, {
@@ -34,10 +34,10 @@ executeTests("Maybe implementation", [{
         should: "return a Maybe(Something)",
         test: (test) => test(function(t) {
             const testedModule = m({});
-            t.equal(testedModule.createMaybe("foo").isNothing, false, "Ok for strings");
-            t.equal(testedModule.createMaybe(123).isNothing, false, "Ok for numbers");
-            t.equal(testedModule.createMaybe([]).isNothing, false, "Ok for arrays");
-            t.equal(testedModule.createMaybe({}).isNothing, false, "Ok for objects");
+            t.equal(testedModule.createMaybe("foo").isNothing(), false, "Ok for strings");
+            t.equal(testedModule.createMaybe(123).isNothing(), false, "Ok for numbers");
+            t.equal(testedModule.createMaybe([]).isNothing(), false, "Ok for arrays");
+            t.equal(testedModule.createMaybe({}).isNothing(), false, "Ok for objects");
             t.end();
         })
     }, {
@@ -46,7 +46,7 @@ executeTests("Maybe implementation", [{
         test: (test) => test(function(t) {
             const testedModule = m({});
             t.equal(
-                testedModule.createMaybe(new Error("DERP")).isNothing,
+                testedModule.createMaybe(new Error("DERP")).isNothing(),
                 true
             );
             t.end();
@@ -70,7 +70,7 @@ executeTests("Maybe implementation", [{
             const testedModule = m({});
             const something = testedModule.createMaybe(() => "foo");
             t.equal(something.isMaybe, true);
-            t.equal(something.isNothing, false);
+            t.equal(something.isNothing(), false);
             t.equal(something.value, "foo");
             t.end();
         })
@@ -119,7 +119,7 @@ executeTests("Maybe implementation", [{
             const newNothing = something.map(utilityFunctions.throwFnHO("DERP"));
             t.equal(newNothing.isMaybe, true, "Applying map() results in a Maybe");
             t.equal(newNothing === something, false, "A different Maybe instance");
-            t.equal(newNothing.isNothing, true, "Resulting Maybe is a Maybe(Nothing)");
+            t.equal(newNothing.isNothing(), true, "Resulting Maybe is a Maybe(Nothing)");
             t.end();
         })
     }, {
