@@ -164,7 +164,8 @@ myFlow({
 But, like me and any other sane coder, you want to do something in case the flow failed and you end up with a Either(Left()), So you can chain your flow with `ifLeft` which will have the double advantage of letting you:
 
 - Invoke a callback in case something went wrong, and you ended up with
-  a Left()
+  a Left(). The callback will be call with the Left() value so that you can act
+  upon it.
 - Unwrap the resulting value out of the Either(Right()) monad if everything went right
 
 Let the magic happen:
@@ -182,12 +183,12 @@ myFlow({
     foo: {
         oups: ":3"
     }
-}).ifLeft(() => console.log("Ouch !"));
-// => "Ouch !"
+}).ifLeft((e) => console.log(`Ouch ! ${e.toString()}`));
+// => "Ouch ! Reference Error: bar is not defined"
 ```
 
-No guard clauses, no try/catch, nothing.
-You just go with the flow.
+Again, no guard clauses, no try/catch, nothing.
+Again, you just go with the flow.
 
 ### Oh you want more ?
 
