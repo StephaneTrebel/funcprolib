@@ -3,71 +3,60 @@ import {
     isFunction
 } from "lodash/fp";
 
-function newMaybe(input) {
-    const internalMaybe = {};
-    internalMaybe.isMaybe = true;
-    internalMaybe.of = function(input) {
+function createMaybe(input) {
+    const newMaybe = {};
+    newMaybe.isMaybe = true;
+    newMaybe.of = function(input) {
         if (input && input.isMaybe) {
             return input;
         }
         if (isError(input)) {
-            return internalMaybe.of();
+            return newMaybe.of();
         }
         if (isFunction(input)) {
-            return internalMaybe.map(input);
+            return newMaybe.map(input);
         }
-        internalMaybe.value = input;
+        newMaybe.value = input;
 
-        if (internalMaybe.value) {
-            internalMaybe.nothing = false;
+        if (newMaybe.value) {
+            newMaybe.isNothing = false;
         } else {
-            internalMaybe.nothing = true;
+            newMaybe.isNothing = true;
         }
-
-        return internalMaybe;
+        return newMaybe;
     };
-    internalMaybe.isNothing = function() {
-        return internalMaybe.nothing;
-    };
-    internalMaybe.toString = function() {
-        return `Maybe(${internalMaybe.isNothing() ? "Nothing" : internalMaybe.value})`;
-    };
-    internalMaybe.map = function(fn) {
-        if (internalMaybe.isNothing()) {
-            return internalMaybe;
+    newMaybe.toString = () => `Maybe(${newMaybe.isNothing ? "Nothing" : newMaybe.value})`;
+    newMaybe.map = function(fn) {
+        if (newMaybe.isNothing) {
+            return newMaybe;
         }
         try {
-            return internalMaybe.of(fn(internalMaybe.value));
+            return createMaybe(fn(newMaybe.value));
         } catch (err) {
-            return internalMaybe.of(err);
+            return createMaybe(err);
         }
     };
-    internalMaybe.ifNothing = function(fn) {
-        if (internalMaybe.isNothing() && isFunction(fn)) {
-            fn();
-        }
-        return internalMaybe;
-    };
-    internalMaybe.orElse = function(input) {
-        if (internalMaybe.isNothing()) {
+    newMaybe.orElse = function(input) {
+        if (newMaybe.isNothing) {
             if (isFunction(input)) {
                 return input();
             }
             return input;
         }
-        return internalMaybe.value;
+        return newMaybe.value;
     };
-    return internalMaybe.of(input);
+    return newMaybe.of(input);
 }
 
 function maybeFlow(...fns) {
     const applier = (input) => fns.reduce(
-        (prev, curr) => prev.map(curr), newMaybe(input)
+        (prev, curr) => prev.map(curr), createMaybe(input)
     );
     applier.orElse = (errorFn) => (input) => applier(input).orElse(errorFn);
     return applier;
 }
 
 export {
+    createMaybe,
     maybeFlow
 };
