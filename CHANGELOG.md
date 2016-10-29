@@ -3,6 +3,7 @@ Highest priority:
 Normal priority:
 
 [NEXT VERSION]
+- [FEATURE]: Add a eitherFlow.debug method
 
 [1.1.1]
 - [FIX]: Fix Either isLeft() implementation: it was not calling its callback

@@ -55,6 +55,23 @@ function eitherFlow(...fns) {
     return applier;
 }
 
+eitherFlow.debug = function(...fns) {
+    let functionCall = 0;
+    const applier = (input) => fns.reduce(
+        (prev, curr) => {
+            const eitherDebug = "Either Debug - "
+            console.log(eitherDebug + "Call #", ++functionCall);
+            console.log(eitherDebug + "Current=", prev);
+            console.log(eitherDebug + "Next function=", curr);
+            const temp = prev.map(curr);
+            console.log(eitherDebug + "New value=", temp);
+            return temp;
+        }, createEither(input)
+    );
+    applier.ifLeft = (errorFn) => (input) => applier(input).ifLeft(errorFn);
+    return applier;
+}
+
 export {
     createEither,
     eitherFlow
