@@ -13,7 +13,7 @@ function createEither(input) {
             return input;
         }
         if (isError(input) || isNull(input) || Number.isNaN(input) || isUndefined(input)) {
-            newEither.left = input;
+            newEither.left = (isError(input)) ? input.stack : input;
             newEither.hasLeft = true;
             return newEither;
         }
@@ -23,7 +23,8 @@ function createEither(input) {
         newEither.right = input;
         return newEither;
     };
-    newEither.toString = () => `Either(Left(${newEither.left}), Right(${newEither.right}))`;
+    newEither.toString = () => (newEither.isLeft()) ? `Either(Left(${newEither.left}))` :
+        `Either(Right(${JSON.stringify(newEither.right)}))`;
     newEither.isLeft = () => !!newEither.hasLeft;
     newEither.map = function(fn) {
         if (newEither.isLeft()) {
@@ -38,7 +39,10 @@ function createEither(input) {
     newEither.ifLeft = function(input) {
         if (newEither.isLeft()) {
             if (isFunction(input)) {
+                if (newEither.left) {
                 return input(newEither.left);
+                }
+                return input(new Error ("Either is a Left()"));
             }
             return input;
         }
@@ -58,13 +62,17 @@ function eitherFlow(...fns) {
 eitherFlow.debug = function(...fns) {
     let functionCall = 0;
     const applier = (input) => fns.reduce(
-        (prev, curr) => {
-            const eitherDebug = "Either Debug - "
-            console.log(eitherDebug + "Call #", ++functionCall);
-            console.log(eitherDebug + "Current=", prev);
-            console.log(eitherDebug + "Next function=", curr);
+        function(prev, curr) {
+            const eitherDebug = "Either Debug - ";
             const temp = prev.map(curr);
-            console.log(eitherDebug + "New value=", temp);
+            if (prev.isLeft()) {
+                console.log(eitherDebug + "Either is a Left(). Bypassing ", curr.toString().split("\n")[0]);
+            } else {
+                console.log(eitherDebug + "Call #", ++functionCall);
+                console.log(eitherDebug + "Current value=", prev.toString());
+                console.log(eitherDebug + "Next function=", curr);
+                console.log(eitherDebug + "New value=", temp.toString());
+            }
             return temp;
         }, createEither(input)
     );
