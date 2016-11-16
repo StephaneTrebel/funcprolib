@@ -2,7 +2,7 @@
 Highest priority:
 Normal priority:
 
-[NEXT VERSION]
+[1.2.1]
 - [FEATURE]: Add a eitherFlow.debug method
 
 [1.1.1]

@@ -52,7 +52,7 @@ executeTests("Either implementation", [{
             const err = new Error("DERP");
             const newEither = testedModule.createEither(err);
             t.equal(newEither.isLeft(), true);
-            t.equal(newEither.left, err);
+            t.equal(newEither.left, err.stack);
             t.end();
         })
     }, {
@@ -127,7 +127,7 @@ executeTests("Either implementation", [{
             t.equal(newEither.isEither, true, "Applying map() results in a Either");
             t.equal(newEither === either, false, "A different Either instance");
             t.equal(newEither.isLeft(), true, "Resulting Either is a Either(Left())");
-            t.equal(newEither.left, err, "Left content is the thrown error");
+            t.equal(newEither.left, err.stack, "Left content is the thrown error stack");
             t.end();
         })
     }, {
@@ -147,10 +147,10 @@ executeTests("Either implementation", [{
         should: "return the application of given function on the Left() value",
         test: (test) => test(function(t) {
             const testedModule = m({});
-            const either = testedModule.createEither(new Error("DERP"));
+            const either = testedModule.createEither();
             t.equal(
-                either.ifLeft((e) => e.toString()),
-                "Error: DERP"
+                either.ifLeft(utilityFunctions.idFn).includes("Either is a Left()"),
+                true
             );
             t.end();
         })
@@ -200,6 +200,65 @@ executeTests("Either implementation", [{
         test: (test) => test(function(t) {
             const testedModule = m({});
             const applier = testedModule.eitherFlow(
+                (a) => a + "bar",
+                (b) => b + "qux"
+            ).ifLeft();
+            t.equal(
+                applier("foo"),
+                "foobarqux"
+            );
+            t.end();
+        })
+    }]
+}, {
+    name: "eitherFlow.debug()",
+    assertions: [{
+        when: "called with no function list",
+        should: "return a function that returns a Either",
+        test: (test) => test(function(t) {
+            const testedModule = m({});
+            t.equal(
+                testedModule.eitherFlow.debug()().isEither,
+                true
+            );
+            t.end();
+        })
+    }, {
+        when: "called with a function list",
+        should: "return a function that will apply all functions of given list on a given Either()",
+        test: (test) => test(function(t) {
+            const testedModule = m({});
+            t.equal(
+                testedModule.eitherFlow.debug(
+                    (a) => a + "bar",
+                    (b) => b + "qux"
+                )("foo").ifLeft(),
+                "foobarqux"
+            );
+            t.end();
+        })
+    }, {
+        when: "called with a function list",
+        should: "return a function that will ignore all subsequent function call upon encountering an Either(Left())",
+        test: (test) => test(function(t) {
+            const testedModule = m({});
+            t.equal(
+                testedModule.eitherFlow.debug(
+                    (a) => a + "bar",
+                    utilityFunctions.throwFnHO("DERP"),
+                    // istanbul ignore next
+                    (b) => b + "qux"
+                    )("foo").ifLeft(utilityFunctions.idFn).includes("DERP"),
+                true
+            );
+            t.end();
+        })
+    }, {
+        when: "called with a function list",
+        should: "return a function that has an ifLeft property which is a shortcut to the resulting Either().ifLeft method",
+        test: (test) => test(function(t) {
+            const testedModule = m({});
+            const applier = testedModule.eitherFlow.debug(
                 (a) => a + "bar",
                 (b) => b + "qux"
             ).ifLeft();

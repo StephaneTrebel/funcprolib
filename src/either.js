@@ -42,7 +42,7 @@ function createEither(input) {
                 if (newEither.left) {
                     return input(newEither.left);
                 }
-                return input(new Error("Either is a Left()"));
+                return input(newEither.of(new Error("Either is a Left()")).left);
             }
             return input;
         }
