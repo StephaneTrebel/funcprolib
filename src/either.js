@@ -40,9 +40,9 @@ function createEither(input) {
         if (newEither.isLeft()) {
             if (isFunction(input)) {
                 if (newEither.left) {
-                return input(newEither.left);
+                    return input(newEither.left);
                 }
-                return input(new Error ("Either is a Left()"));
+                return input(new Error("Either is a Left()"));
             }
             return input;
         }
@@ -68,17 +68,18 @@ eitherFlow.debug = function(...fns) {
             if (prev.isLeft()) {
                 console.log(eitherDebug + "Either is a Left(). Bypassing ", curr.toString().split("\n")[0]);
             } else {
-                console.log(eitherDebug + "Call #", ++functionCall);
-                console.log(eitherDebug + "Current value=", prev.toString());
-                console.log(eitherDebug + "Next function=", curr);
-                console.log(eitherDebug + "New value=", temp.toString());
+                functionCall = functionCall + 1;
+                console.log(`${eitherDebug}Call #${functionCall}`);
+                console.log(`${eitherDebug}Current value=${prev.toString()}`);
+                console.log(`${eitherDebug}Next function=${curr}`);
+                console.log(`${eitherDebug}New value=${temp.toString()}`);
             }
             return temp;
         }, createEither(input)
     );
     applier.ifLeft = (errorFn) => (input) => applier(input).ifLeft(errorFn);
     return applier;
-}
+};
 
 export {
     createEither,
