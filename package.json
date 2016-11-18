@@ -35,7 +35,7 @@
         "coveralls": "~2.11.15",
         "faucet": "~0.0.1",
         "jsdoc": "~3.4.3",
-        "jslint": "~0.10.3",
+        "jslint": "stephanetrebel/node-jslint",
         "nyc": "~9.0.1",
         "semtest": "2.0.1",
         "semtest-e2e": "2.0.1",
