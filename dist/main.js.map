@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/main.js"],"names":["maybeFlow","eitherFlow"],"mappings":";;;;;;;AAAA;;AAIA;;QAMIA,S;QACAC,U","file":"main.js","sourcesContent":["import {\n    maybeFlow\n} from \"./maybe.js\";\n\nimport {\n    eitherFlow\n} from \"./either.js\";\n\n\nexport {\n    maybeFlow,\n    eitherFlow\n};\n"]}
