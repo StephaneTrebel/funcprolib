@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3>funcprolib 1.2.2</h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><p><a href="https://travis-ci.org/StephaneTrebel/funcprolib"><img src="https://travis-ci.org/StephaneTrebel/funcprolib.svg?branch=master" alt="Build Status"></a>
+<a href="https://coveralls.io/github/StephaneTrebel/funcprolib?branch=master"><img src="https://coveralls.io/repos/github/StephaneTrebel/funcprolib/badge.svg?branch=master" alt="Coverage Status"></a>
+<a href="https://codeclimate.com/github/StephaneTrebel/funcprolib"><img src="https://codeclimate.com/github/StephaneTrebel/funcprolib/badges/gpa.svg" alt="Code Climate"></a>
+<a href="https://david-dm.org/StephaneTrebel/funcprolib"><img src="https://david-dm.org/StephaneTrebel/funcprolib.svg" alt="Dependency Status"></a>
+<a href="https://david-dm.org/StephaneTrebel/funcprolib##info=devDependencies"><img src="https://david-dm.org/StephaneTrebel/funcprolib/dev-status.svg" alt="devDependency Status"></a></p>
+<h1>funcprolib</h1><p>My personal Functional Programming Library</p>
+<h2>So what is this about ?</h2><p>Functional Programming is awesome, and javascript has the great benefit of letting us easily implement some of the most useful FP paradigms in our daily coding work, both on the frontend and on the backend.</p>
+<p>This library is my take on the subject. As time goes on I'll add more and more FP paradigms to help me in my projects, but since I'm publishing it on npm, it can help you yoo !</p>
+<h2>How to get started</h2><p><code>npm install --save funcprolib</code> and rock on !</p>
+<h2>How to use</h2><pre class="prettyprint source lang-javascript"><code>import {
+    maybeFlow,
+    eitherFlow
+} from &quot;funcprolib&quot;
+
+const myMaybe = maybeFlow(
+    fn1,
+    fn2,
+    ...
+    fnN
+)[.orElse(fnErr)](myStartingValue)
+
+const myEither = eitherFlow(
+    fn1,
+    fn2,
+    ...
+    fnN
+)[.ifLeft(fnErr)](myStartingValue)</code></pre><h2>API</h2><h3>maybeFlow</h3><p><code>maybeFlow</code> is my implementation of the <em>Maybe</em> monad.</p>
+<p><em>maybeFlow: fn[] =&gt; A =&gt; Maybe fn<a href="A"></a></em></p>
+<p>In other words, you first call it with any number of functions. It will return you a function. And then you call this function with a value. <code>maybeFlow</code>, as its name implies, will convert the given value in a <code>Maybe(value)</code> and will map all functions in order, starting with your value and passing each and every result through the function list.</p>
+<p>As any Maybe implementation, any failure in the process will result in a Maybe(Nothing) and, that's the main point, <em>all other functions calls are bypassed</em>. It's either a complete success or an utter failure.</p>
+<p>Let's say that your &quot;flow&quot; (meaning your function list) is:</p>
+<pre class="prettyprint source lang-javascript"><code>const myFlow = maybeFlow(
+    (a) => a.foo,
+    (b) => b.bar,
+    (c) => c.qux
+);</code></pre><p>Calling it with the appropriate object will succeed:</p>
+<pre class="prettyprint source lang-javascript"><code>myFlow({
+    foo: {
+        bar: {
+            qux: &quot;Hello !&quot;
+        }
+    }
+}).toString();
+// => Maybe(Hello !)</code></pre><p>But calling it with an inappropriate object will fail, as soon as possible:</p>
+<pre class="prettyprint source lang-javascript"><code>myFlow({
+    foo: {
+        oups: &quot;:3&quot;
+    }
+}).toString()
+// => Maybe(Nothing)</code></pre><p>But, like me and any other sane coder, you want to do something in case the flow failed and you end up with a Maybe(Nothing), So you can chain your flow with <code>orElse</code> which will have the double advantage of letting you:</p>
+<ul>
+<li>Invoke a callback in case something went wrong</li>
+<li>Unwrap the resulting value out of the Maybe monad if everything went right</li>
+</ul>
+<p>Let the magic happen:</p>
+<pre class="prettyprint source lang-javascript"><code>myFlow({
+    foo: {
+        bar: {
+            qux: &quot;Hello !&quot;
+        }
+    }
+}).orElse(() => console.log(&quot;Ouch !&quot;));
+// => Hello !
+
+myFlow({
+    foo: {
+        oups: &quot;:3&quot;
+    }
+}).orElse(() => console.log(&quot;Ouch !&quot;));
+// => Ouch !</code></pre><p>No guard clauses, no try/catch, nothing.
+You just go with the flow.</p>
+<p>If you need to know why your flow failed, though, you're going to need a little more complex Monad. Enter <em>Either</em>.</p>
+<h3>eitherFlow</h3><p><code>eitherFlow</code> is my implementation of the <em>Either</em> monad.</p>
+<p><em>eitherFlow: fn[] =&gt; A =&gt; Either fn<a href="A"></a></em></p>
+<p>In other words, you first call it with any number of functions. It will return you a function. And then you call this function with a value. <code>eitherFlow</code>, as its name implies, will convert the given value in a <code>Either(Left(value))</code> or <code>Either(Right(value))</code>, depending on <code>value</code>'s &quot;rightness&quot;, and will map all functions in order, starting with your value and passing each and every result through the function list.</p>
+<p>A value is defined as &quot;right&quot;, if it's not:</p>
+<ul>
+<li>Undefined</li>
+<li>Null</li>
+<li>NaN</li>
+<li>An Error instance</li>
+</ul>
+<p>As long as your Either is an Either(Right()), as any Either implementation, functions will be apply in cascade style, but if at some point the cascading value become &quot;not right&quot;, as defined above, the process will result in a Either(Left(Something)), where the Something is the &quot;non right&quot; value. Additionnaly, and that's actually the main feature, <em>all other functions calls are bypassed</em>. It's either a complete success or an utter failure, but you can also know why it failed in the first place.</p>
+<p>Let's say that your &quot;flow&quot; (meaning your function list) is:</p>
+<pre class="prettyprint source lang-javascript"><code>const myFlow = eitherFlow(
+    (a) => a.foo,
+    (b) => b.bar,
+    (c) => c.qux
+);</code></pre><p>Calling it with the appropriate object will succeed:</p>
+<pre class="prettyprint source lang-javascript"><code>myFlow({
+    foo: {
+        bar: {
+            qux: &quot;Hello !&quot;
+        }
+    }
+}).toString();
+// => Either(Right(&quot;Hello !&quot;))</code></pre><p>But calling it with an inappropriate object will fail, as soon as possible:</p>
+<pre class="prettyprint source lang-javascript"><code>myFlow({
+    foo: {
+        oups: &quot;:3&quot;
+    }
+}).toString()
+// => Either(Left(&quot;Reference Error: bar is not defined&quot;))</code></pre><p>But, like me and any other sane coder, you want to do something in case the flow failed and you end up with a Either(Left()), So you can chain your flow with <code>ifLeft</code> which will have the double advantage of letting you:</p>
+<ul>
+<li>Invoke a callback in case something went wrong, and you ended up with
+a Left(). The callback will be call with the Left() value so that you can act
+upon it.</li>
+<li>Unwrap the resulting value out of the Either(Right()) monad if everything went right</li>
+</ul>
+<p>Let the magic happen:</p>
+<pre class="prettyprint source lang-javascript"><code>myFlow({
+    foo: {
+        bar: {
+            qux: &quot;Hello !&quot;
+        }
+    }
+}).ifLeft(() => console.log(&quot;Ouch !&quot;));
+// => &quot;Hello !&quot;
+
+myFlow({
+    foo: {
+        oups: &quot;:3&quot;
+    }
+}).ifLeft((e) => console.log(`Ouch ! ${e.toString()}`));
+// => &quot;Ouch ! Reference Error: bar is not defined&quot;</code></pre><p>Again, no guard clauses, no try/catch, nothing.
+Again, you just go with the flow.</p>
+<h3>Oh you want more ?</h3><p>I may implement some other FP-oriented implementations here, since it's everending wonder of an abstraction universe...let me know if you want me to investigate some particular point of interest !</p>
+<h2>Contributing</h2><p>Well, let's see how it goes first, and we'll see. I'm open to criticism and ideas, though, so feel free to create an Issue :D</p>
+<h2>Licence</h2><p>Do whatever the frack you want with it, as long as you link back to this repo.
+So share away !</p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Fri Nov 18 2016 08:47:31 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

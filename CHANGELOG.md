@@ -2,6 +2,9 @@
 Highest priority:
 Normal priority:
 
+[1.2.2]
+- [FIX]: Fix dist export for npm packaging
+
 [1.2.1]
 - [FEATURE]: Add a eitherFlow.debug method
 
