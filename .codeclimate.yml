@@ -25,6 +25,7 @@ ratings:
   - "**.py"
   - "**.rb"
 exclude_paths: [
+    "dist",
     "docs",
     "**/*.spec.js"
 ]
