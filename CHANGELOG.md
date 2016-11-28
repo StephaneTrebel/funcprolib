@@ -3,6 +3,8 @@ Highest priority:
 Normal priority:
 
 [NEXT VERSION]
+
+[1.2.3]
 - [REFACTOR]: Factor out all common code between Either and Maybe
 
 [1.2.2]
