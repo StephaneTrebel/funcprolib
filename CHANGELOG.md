@@ -2,6 +2,9 @@
 Highest priority:
 Normal priority:
 
+[NEXT VERSION]
+- [REFACTOR]: Factor out all common code between Either and Maybe
+
 [1.2.2]
 - [FIX]: Fix dist export for npm packaging
 
