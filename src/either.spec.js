@@ -1,270 +1,182 @@
 import {
-    executeTests,
-    prepareForTests,
-    utilityFunctions
+    executeTests
 } from "../tests/unit-tests.js";
 
-const m = prepareForTests(__filename);
+import {
+    createErroneousMonad,
+    createSuccessfulMonad,
+    getErroneousValue,
+    getSuccessfulValue,
+    isInErrorState,
+    toString
+} from "./either";
 
-executeTests("Either implementation", [{
-    name: "createEither() - Creating a Either",
+executeTests("Either Monad definition", [{
+    name: "createErroneousMonad()",
     assertions: [{
-        when: "called without any input",
-        should: "return a Either(Left())",
-        test: (test) => test(function(t) {
-            const testedModule = m({});
-            t.equal(
-                testedModule.createEither().isLeft(),
-                true
-            );
-            t.end();
-        })
-    }, {
-        when: "called with any null type",
-        should: "return a Either(Left())",
-        test: (test) => test(function(t) {
-            const testedModule = m({});
-            t.equal(testedModule.createEither(null).isLeft(), true, "Ok for null");
-            t.equal(testedModule.createEither(undefined).isLeft(), true, "Ok for undefined");
-            t.equal(testedModule.createEither(NaN).isLeft(), true, "Ok for NaN");
-            t.end();
-        })
-    }, {
-        when: "called with any non-null type",
-        should: "return a Either(Left(), Right(Something))",
-        test: (test) => test(function(t) {
-            const testedModule = m({});
-            t.equal(testedModule.createEither("foo").isLeft(), false, "Not a Left()");
-            t.equal(testedModule.createEither("foo").right, "foo", "Right has correct value");
-            t.equal(testedModule.createEither(123).isLeft(), false, "Not a Left()");
-            t.equal(testedModule.createEither(123).right, 123, "Right has correct value");
-            t.equal(testedModule.createEither([]).isLeft(), false, "Not a Left()");
-            t.deepEqual(testedModule.createEither([]).right, [], "Right has correct value");
-            t.equal(testedModule.createEither({}).isLeft(), false, "Not a Left()");
-            t.deepEqual(testedModule.createEither({}).right, {}, "Right has correct value");
-            t.end();
-        })
-    }, {
         when: "called with an Error",
-        should: "return a Either(Left(given error), Right())",
+        should: "return an Either(Left)",
         test: (test) => test(function(t) {
-            const testedModule = m({});
-            const err = new Error("DERP");
-            const newEither = testedModule.createEither(err);
-            t.equal(newEither.isLeft(), true);
-            t.equal(newEither.left, err.stack);
+            const either = createErroneousMonad(new Error("DERP"));
+            t.equal(either.hasLeft, true, "It has a Left value");
+            t.equal(either.left.includes("DERP"), true, "Left value includes the error message");
             t.end();
         })
     }, {
-        when: "called with a Either",
-        should: "return the same Either",
+        when: "called with anything else than an Error",
+        should: "return an Either(Left)",
         test: (test) => test(function(t) {
-            const testedModule = m({});
-            const either = testedModule.createEither();
-            t.equal(
-                testedModule.createEither(either),
-                either
-            );
-            t.end();
-        })
-    }, {
-        when: "called with a Function",
-        should: "return a Either wrapping the given function application on 'undefined'",
-        test: (test) => test(function(t) {
-            const testedModule = m({});
-            const either = testedModule.createEither(() => "foo");
-            t.equal(either.isEither, true);
-            t.equal(either.isLeft(), false);
-            t.equal(either.right, "foo");
+            const testInput = function(input, msg) {
+                const either = createErroneousMonad(input);
+                t.deepEqual(either.hasLeft, true, `It has a Left value for ${msg}`);
+                t.deepEqual(either.left, input, `Ok for ${msg}`);
+            };
+            testInput("foo", "Strings");
+            testInput(123, "Numbers");
+            testInput({}, "empty Objects");
+            testInput({
+                foo: "bar",
+                qux: "baz"
+            }, "non-empty Objects");
+            testInput([], "empty Arrays");
+            testInput(["foo", "bar", "qux"], "non-empty Arrays");
             t.end();
         })
     }]
 }, {
-    name: "createEither() - Using a Either",
+    name: "createSuccessfulMonad()",
     assertions: [{
-        when: "a Either has its toString method called",
-        should: "return a string",
+        when: "...everytime",
+        should: "return an Either(Right) with given input as internal value",
         test: (test) => test(function(t) {
-            const testedModule = m({});
-            t.equal(typeof testedModule.createEither("foo").toString(), "string");
-            t.equal(typeof testedModule.createEither().toString(), "string");
-            t.end();
-        })
-    }, {
-        when: "a Either(Left(Something)) has its map method called with any function",
-        should: "return the same Either(Left(Something))) without invoking the mapping function",
-        test: (test) => test(function(t) {
-            const testedModule = m({});
-            const either = testedModule.createEither();
-            t.equal(
-                either.map(utilityFunctions.throwFnHO("I shan't be thrown !")),
-                either
-            );
-            t.end();
-        })
-    }, {
-        when: "a Either(Right(Something)) has its map method called with any succeeding function",
-        should: "return a new Either(Right(Something)) wrapping the application result of given function onto its Something",
-        test: (test) => test(function(t) {
-            const testedModule = m({});
-            const either = testedModule.createEither("foo");
-            const newEither = either.map((s) => s + "bar");
-            t.equal(newEither.isEither, true, "Applying map() results in a Either");
-            t.equal(newEither === either, false, "A different Either instance");
-            t.equal(newEither.right, "foobar", "Its content is the function application");
-            t.end();
-        })
-    }, {
-        when: "a Either(Right(Something)) has its map method called with any failing function",
-        should: "return a new Either(Left(failing error))",
-        test: (test) => test(function(t) {
-            const testedModule = m({});
-            const err = new Error("DERP");
-            const either = testedModule.createEither("foo");
-            const newEither = either.map(function() {
-                throw err;
-            });
-            t.equal(newEither.isEither, true, "Applying map() results in a Either");
-            t.equal(newEither === either, false, "A different Either instance");
-            t.equal(newEither.isLeft(), true, "Resulting Either is a Either(Left())");
-            t.equal(newEither.left, err.stack, "Left content is the thrown error stack");
-            t.end();
-        })
-    }, {
-        when: "a Either(Right()) has its ifLeft method called, regardless of given input",
-        should: "return the value wrapped in its Right()",
-        test: (test) => test(function(t) {
-            const testedModule = m({});
-            const either = testedModule.createEither("foo");
-            t.equal(
-                either.ifLeft(utilityFunctions.throwFnHO("I shan't be thrown !")),
-                "foo"
-            );
-            t.end();
-        })
-    }, {
-        when: "a Either(Left()) has its ifLeft method called with a function",
-        should: "return the application of given function on the Left() value",
-        test: (test) => test(function(t) {
-            const testedModule = m({});
-            const either = testedModule.createEither();
-            t.equal(
-                either.ifLeft(utilityFunctions.idFn).includes("Either is a Left()"),
-                true
-            );
-            t.end();
-        })
-    }, {
-        when: "a Either(Left()) has its ifLeft method called with anything else than function",
-        should: "return the given input",
-        test: (test) => test(function(t) {
-            const testedModule = m({});
-            const either = testedModule.createEither();
-            t.equal(
-                either.ifLeft("foo"),
-                "foo"
-            );
+            const testInput = function(input, msg) {
+                const either = createSuccessfulMonad(input);
+                t.deepEqual(!!either.hasLeft, false, `It has a Right value for ${msg}`);
+                t.deepEqual(either.right, input, `Ok for ${msg}`);
+            };
+            testInput("foo", "Strings");
+            testInput(123, "Numbers");
+            testInput({}, "empty Objects");
+            testInput({
+                foo: "bar",
+                qux: "baz"
+            }, "non-empty Objects");
+            testInput([], "empty Arrays");
+            testInput(["foo", "bar", "qux"], "non-empty Arrays");
             t.end();
         })
     }]
 }, {
-    name: "eitherFlow()",
+    name: "getErroneousValue()",
     assertions: [{
-        when: "called with no function list",
-        should: "return a function that returns a Either",
+        when: "given any Either(Left)",
+        should: "return input left value",
         test: (test) => test(function(t) {
-            const testedModule = m({});
-            t.equal(
-                testedModule.eitherFlow()().isEither,
-                true
+            const testInput = (input, msg) => t.deepEqual(
+                getErroneousValue(createErroneousMonad(input)), input, `Ok for ${msg}`
             );
-            t.end();
-        })
-    }, {
-        when: "called with a function list",
-        should: "return a function that will apply all functions of given list on a given Either()",
-        test: (test) => test(function(t) {
-            const testedModule = m({});
-            t.equal(
-                testedModule.eitherFlow(
-                    (a) => a + "bar",
-                    (b) => b + "qux"
-                )("foo").ifLeft(),
-                "foobarqux"
-            );
-            t.end();
-        })
-    }, {
-        when: "called with a function list",
-        should: "return a function that has an ifLeft property which is a shortcut to the resulting Either().ifLeft method",
-        test: (test) => test(function(t) {
-            const testedModule = m({});
-            const applier = testedModule.eitherFlow(
-                (a) => a + "bar",
-                (b) => b + "qux"
-            ).ifLeft();
-            t.equal(
-                applier("foo"),
-                "foobarqux"
-            );
+            testInput("foo", "Strings");
+            testInput(123, "Numbers");
+            testInput({}, "empty Objects");
+            testInput({
+                foo: "bar",
+                qux: "baz"
+            }, "non-empty Objects");
+            testInput([], "empty Arrays");
+            testInput(["foo", "bar", "qux"], "non-empty Arrays");
             t.end();
         })
     }]
 }, {
-    name: "eitherFlow.debug()",
+    name: "getSuccessfulValue()",
     assertions: [{
-        when: "called with no function list",
-        should: "return a function that returns a Either",
+        when: "given any Either(Right)",
+        should: "return input right value",
         test: (test) => test(function(t) {
-            const testedModule = m({});
+            const testInput = (input, msg) => t.deepEqual(
+                getSuccessfulValue(createSuccessfulMonad(input)), input, `Ok for ${msg}`
+            );
+            testInput("foo", "Strings");
+            testInput(123, "Numbers");
+            testInput({}, "empty Objects");
+            testInput({
+                foo: "bar",
+                qux: "baz"
+            }, "non-empty Objects");
+            testInput([], "empty Arrays");
+            testInput(["foo", "bar", "qux"], "non-empty Arrays");
+            t.end();
+        })
+    }]
+}, {
+    name: "isInErrorState()",
+    assertions: [{
+        when: "given any Either(Right)",
+        should: "return false",
+        test: (test) => test(function(t) {
+            const testInput = (input, msg) => t.deepEqual(
+                isInErrorState(createSuccessfulMonad(input)), false, `Ok for ${msg}`
+            );
+            testInput("foo", "Strings");
+            testInput(123, "Numbers");
+            testInput({}, "empty Objects");
+            testInput({
+                foo: "bar",
+                qux: "baz"
+            }, "non-empty Objects, without an hasLeft property");
+            testInput({
+                foo: "bar",
+                qux: "baz",
+                hasLeft: false
+            }, "non-empty Objects, with a falsy hasLeft property");
+            testInput([], "empty Arrays");
+            testInput(["foo", "bar", "qux"], "non-empty Arrays");
+            t.end();
+        })
+    }, {
+        when: "given any Either(Left)",
+        should: "return true",
+        test: (test) => test(function(t) {
+            const testInput = (input, msg) => t.deepEqual(
+                isInErrorState(createErroneousMonad(input)), true, `Ok for ${msg}`
+            );
+            testInput(new Error("DERP"), "Errors");
+            testInput({
+                foo: "bar",
+                hasLeft: true
+            }, "Objects forcibly having a truthy hasLeft property");
+            t.end();
+        })
+    }]
+}, {
+    name: "toString()",
+    assertions: [{
+        when: "given any Either(Right)",
+        should: "return a String stating the Monad is an Either(Right)",
+        test: (test) => test(function(t) {
+            const either = createSuccessfulMonad("foo");
             t.equal(
-                testedModule.eitherFlow.debug()().isEither,
-                true
+                toString(either).includes("Either"), true,
+                "it states that given input is an Either"
+            );
+            t.equal(
+                toString(either).includes("Right"), true,
+                "it states that given input is an Either(Right)"
             );
             t.end();
         })
     }, {
-        when: "called with a function list",
-        should: "return a function that will apply all functions of given list on a given Either()",
+        when: "given any Either(Left)",
+        should: "return a String stating the Monad is an Either(Left)",
         test: (test) => test(function(t) {
-            const testedModule = m({});
+            const either = createErroneousMonad("foo");
             t.equal(
-                testedModule.eitherFlow.debug(
-                    (a) => a + "bar",
-                    (b) => b + "qux"
-                )("foo").ifLeft(),
-                "foobarqux"
+                toString(either).includes("Either"), true,
+                "it states that given input is an Either"
             );
-            t.end();
-        })
-    }, {
-        when: "called with a function list",
-        should: "return a function that will ignore all subsequent function call upon encountering an Either(Left())",
-        test: (test) => test(function(t) {
-            const testedModule = m({});
             t.equal(
-                testedModule.eitherFlow.debug(
-                    (a) => a + "bar",
-                    utilityFunctions.throwFnHO("DERP"),
-                    // istanbul ignore next
-                    (b) => b + "qux"
-                    )("foo").ifLeft(utilityFunctions.idFn).includes("DERP"),
-                true
-            );
-            t.end();
-        })
-    }, {
-        when: "called with a function list",
-        should: "return a function that has an ifLeft property which is a shortcut to the resulting Either().ifLeft method",
-        test: (test) => test(function(t) {
-            const testedModule = m({});
-            const applier = testedModule.eitherFlow.debug(
-                (a) => a + "bar",
-                (b) => b + "qux"
-            ).ifLeft();
-            t.equal(
-                applier("foo"),
-                "foobarqux"
+                toString(either).includes("Left"), true,
+                "it states that given input is an Either(Left)"
             );
             t.end();
         })

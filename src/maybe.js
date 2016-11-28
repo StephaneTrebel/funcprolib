@@ -1,61 +1,43 @@
 import {
-    isError,
-    isFunction,
-    isNull,
-    isUndefined
+    get
 } from "lodash/fp";
 
-function createMaybe(input) {
+function createErroneousMonad() {
     const newMaybe = {};
-    newMaybe.isMaybe = true;
-    newMaybe.of = function(input) {
-        if (input && input.isMaybe) {
-            return input;
-        }
-        if (isError(input) || isNull(input) || Number.isNaN(input) || isUndefined(input)) {
-            newMaybe.value = input;
-            newMaybe.hasNothing = true;
-            return newMaybe;
-        }
-        if (isFunction(input)) {
-            return newMaybe.map(input);
-        }
-        newMaybe.value = input;
-        return newMaybe;
-    };
-    newMaybe.toString = () => `Maybe(${newMaybe.isNothing() ? "Nothing" : newMaybe.value})`;
-    newMaybe.isNothing = () => !!newMaybe.hasNothing;
-    newMaybe.map = function(fn) {
-        if (newMaybe.isNothing()) {
-            return newMaybe;
-        }
-        try {
-            return createMaybe(fn(newMaybe.value));
-        } catch (err) {
-            return createMaybe(err);
-        }
-    };
-    newMaybe.orElse = function(input) {
-        if (newMaybe.isNothing()) {
-            if (isFunction(input)) {
-                return input();
-            }
-            return input;
-        }
-        return newMaybe.value;
-    };
-    return newMaybe.of(input);
+    newMaybe.isNothing = true;
+    return newMaybe;
 }
 
-function maybeFlow(...fns) {
-    const applier = (input) => fns.reduce(
-        (prev, curr) => prev.map(curr), createMaybe(input)
-    );
-    applier.orElse = (errorFn) => (input) => applier(input).orElse(errorFn);
-    return applier;
+function createSuccessfulMonad(input) {
+    const newMaybe = {};
+    newMaybe.value = input;
+    return newMaybe;
+}
+
+function getErroneousValue() {
+    return null;
+}
+
+function getSuccessfulValue(newMaybe) {
+    return get("value", newMaybe);
+}
+
+function isInErrorState(monad) {
+    return !!get("isNothing", monad);
+}
+
+function toString(monad) {
+    if (isInErrorState(monad)) {
+        return `Maybe(Nothing)`;
+    }
+    return `Maybe(Something(${getSuccessfulValue(monad)}))`;
 }
 
 export {
-    createMaybe,
-    maybeFlow
+    createErroneousMonad,
+    createSuccessfulMonad,
+    getErroneousValue,
+    getSuccessfulValue,
+    isInErrorState,
+    toString
 };
