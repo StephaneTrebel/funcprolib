@@ -33,7 +33,7 @@ function toString(monad) {
     return `Maybe(Something(${getSuccessfulValue(monad)}))`;
 }
 
-export {
+export default {
     createErroneousMonad,
     createSuccessfulMonad,
     getErroneousValue,

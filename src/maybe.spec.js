@@ -2,14 +2,16 @@ import {
     executeTests
 } from "../tests/unit-tests.js";
 
-import {
+import maybeDefinition from "./maybe";
+
+const {
     createErroneousMonad,
     createSuccessfulMonad,
     getErroneousValue,
     getSuccessfulValue,
     isInErrorState,
     toString
-} from "./maybe";
+} = maybeDefinition;
 
 executeTests("Maybe Monad definition", [{
     name: "createErroneousMonad()",
