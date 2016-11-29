@@ -35,7 +35,7 @@ function toString(monad) {
     return `Either(Right(${JSON.stringify(getSuccessfulValue(monad))}))`;
 }
 
-export {
+export default {
     createErroneousMonad,
     createSuccessfulMonad,
     getErroneousValue,

@@ -4,6 +4,10 @@ Normal priority:
 
 [NEXT VERSION]
 
+[2.0.0]
+- Fix internal exports definitions
+- Rename "ifLeft" and "ifNothing" to the generic "chain"
+
 [1.2.3]
 - [REFACTOR]: Factor out all common code between Either and Maybe
 

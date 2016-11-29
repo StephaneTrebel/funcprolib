@@ -4,6 +4,18 @@ var _unitTests = require("../tests/unit-tests.js");
 
 var _maybe = require("./maybe");
 
+var _maybe2 = _interopRequireDefault(_maybe);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var createErroneousMonad = _maybe2.default.createErroneousMonad,
+    createSuccessfulMonad = _maybe2.default.createSuccessfulMonad,
+    getErroneousValue = _maybe2.default.getErroneousValue,
+    getSuccessfulValue = _maybe2.default.getSuccessfulValue,
+    isInErrorState = _maybe2.default.isInErrorState,
+    toString = _maybe2.default.toString;
+
+
 (0, _unitTests.executeTests)("Maybe Monad definition", [{
     name: "createErroneousMonad()",
     assertions: [{
@@ -11,7 +23,7 @@ var _maybe = require("./maybe");
         should: "return a Maybe(Nothing)",
         test: function test(_test) {
             return _test(function (t) {
-                var maybe = (0, _maybe.createErroneousMonad)(new Error("DERP"));
+                var maybe = createErroneousMonad(new Error("DERP"));
                 t.equal(maybe.isNothing, true, "It is a Nothing");
                 t.end();
             });
@@ -25,7 +37,7 @@ var _maybe = require("./maybe");
         test: function test(_test2) {
             return _test2(function (t) {
                 var testInput = function testInput(input, msg) {
-                    var maybe = (0, _maybe.createSuccessfulMonad)(input);
+                    var maybe = createSuccessfulMonad(input);
                     t.deepEqual(!!maybe.isNothing, false, "is a Something for " + msg);
                     t.deepEqual(maybe.value, input, "Value is ok for " + msg);
                 };
@@ -49,7 +61,7 @@ var _maybe = require("./maybe");
         should: "return null",
         test: function test(_test3) {
             return _test3(function (t) {
-                t.equal((0, _maybe.getErroneousValue)((0, _maybe.createErroneousMonad)()), null);
+                t.equal(getErroneousValue(createErroneousMonad()), null);
                 t.end();
             });
         }
@@ -62,7 +74,7 @@ var _maybe = require("./maybe");
         test: function test(_test4) {
             return _test4(function (t) {
                 var testInput = function testInput(input, msg) {
-                    return t.deepEqual((0, _maybe.getSuccessfulValue)((0, _maybe.createSuccessfulMonad)(input)), input, "Ok for " + msg);
+                    return t.deepEqual(getSuccessfulValue(createSuccessfulMonad(input)), input, "Ok for " + msg);
                 };
                 testInput("foo", "Strings");
                 testInput(123, "Numbers");
@@ -85,7 +97,7 @@ var _maybe = require("./maybe");
         test: function test(_test5) {
             return _test5(function (t) {
                 var testInput = function testInput(input, msg) {
-                    return t.deepEqual((0, _maybe.isInErrorState)((0, _maybe.createSuccessfulMonad)(input)), false, "Ok for " + msg);
+                    return t.deepEqual(isInErrorState(createSuccessfulMonad(input)), false, "Ok for " + msg);
                 };
                 testInput("foo", "Strings");
                 testInput(123, "Numbers");
@@ -110,7 +122,7 @@ var _maybe = require("./maybe");
         test: function test(_test6) {
             return _test6(function (t) {
                 var testInput = function testInput(input, msg) {
-                    return t.deepEqual((0, _maybe.isInErrorState)((0, _maybe.createErroneousMonad)(input)), true, "Ok for " + msg);
+                    return t.deepEqual(isInErrorState(createErroneousMonad(input)), true, "Ok for " + msg);
                 };
                 testInput(new Error("DERP"), "Errors");
                 testInput({
@@ -128,9 +140,9 @@ var _maybe = require("./maybe");
         should: "return a String stating the Monad is a Maybe(Something)",
         test: function test(_test7) {
             return _test7(function (t) {
-                var maybe = (0, _maybe.createSuccessfulMonad)("foo");
-                t.equal((0, _maybe.toString)(maybe).includes("Maybe"), true, "it states that given input is an Maybe");
-                t.equal((0, _maybe.toString)(maybe).includes("Something"), true, "it states that given input is a Maybe(Something)");
+                var maybe = createSuccessfulMonad("foo");
+                t.equal(toString(maybe).includes("Maybe"), true, "it states that given input is an Maybe");
+                t.equal(toString(maybe).includes("Something"), true, "it states that given input is a Maybe(Something)");
                 t.end();
             });
         }
@@ -139,9 +151,9 @@ var _maybe = require("./maybe");
         should: "return a String stating the Monad is a Maybe(Nothing)",
         test: function test(_test8) {
             return _test8(function (t) {
-                var maybe = (0, _maybe.createErroneousMonad)("foo");
-                t.equal((0, _maybe.toString)(maybe).includes("Maybe"), true, "it states that given input is a Maybe");
-                t.equal((0, _maybe.toString)(maybe).includes("Nothing"), true, "it states that given input is a Maybe(Nothing)");
+                var maybe = createErroneousMonad("foo");
+                t.equal(toString(maybe).includes("Maybe"), true, "it states that given input is a Maybe");
+                t.equal(toString(maybe).includes("Nothing"), true, "it states that given input is a Maybe(Nothing)");
                 t.end();
             });
         }

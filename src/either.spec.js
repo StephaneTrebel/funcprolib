@@ -2,14 +2,16 @@ import {
     executeTests
 } from "../tests/unit-tests.js";
 
-import {
+import eitherDefinition from "./either";
+
+const {
     createErroneousMonad,
     createSuccessfulMonad,
     getErroneousValue,
     getSuccessfulValue,
     isInErrorState,
     toString
-} from "./either";
+} = eitherDefinition;
 
 executeTests("Either Monad definition", [{
     name: "createErroneousMonad()",
