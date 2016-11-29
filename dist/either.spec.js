@@ -4,6 +4,18 @@ var _unitTests = require("../tests/unit-tests.js");
 
 var _either = require("./either");
 
+var _either2 = _interopRequireDefault(_either);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var createErroneousMonad = _either2.default.createErroneousMonad,
+    createSuccessfulMonad = _either2.default.createSuccessfulMonad,
+    getErroneousValue = _either2.default.getErroneousValue,
+    getSuccessfulValue = _either2.default.getSuccessfulValue,
+    isInErrorState = _either2.default.isInErrorState,
+    toString = _either2.default.toString;
+
+
 (0, _unitTests.executeTests)("Either Monad definition", [{
     name: "createErroneousMonad()",
     assertions: [{
@@ -11,7 +23,7 @@ var _either = require("./either");
         should: "return an Either(Left)",
         test: function test(_test) {
             return _test(function (t) {
-                var either = (0, _either.createErroneousMonad)(new Error("DERP"));
+                var either = createErroneousMonad(new Error("DERP"));
                 t.equal(either.hasLeft, true, "It has a Left value");
                 t.equal(either.left.includes("DERP"), true, "Left value includes the error message");
                 t.end();
@@ -23,7 +35,7 @@ var _either = require("./either");
         test: function test(_test2) {
             return _test2(function (t) {
                 var testInput = function testInput(input, msg) {
-                    var either = (0, _either.createErroneousMonad)(input);
+                    var either = createErroneousMonad(input);
                     t.deepEqual(either.hasLeft, true, "It has a Left value for " + msg);
                     t.deepEqual(either.left, input, "Ok for " + msg);
                 };
@@ -48,7 +60,7 @@ var _either = require("./either");
         test: function test(_test3) {
             return _test3(function (t) {
                 var testInput = function testInput(input, msg) {
-                    var either = (0, _either.createSuccessfulMonad)(input);
+                    var either = createSuccessfulMonad(input);
                     t.deepEqual(!!either.hasLeft, false, "It has a Right value for " + msg);
                     t.deepEqual(either.right, input, "Ok for " + msg);
                 };
@@ -73,7 +85,7 @@ var _either = require("./either");
         test: function test(_test4) {
             return _test4(function (t) {
                 var testInput = function testInput(input, msg) {
-                    return t.deepEqual((0, _either.getErroneousValue)((0, _either.createErroneousMonad)(input)), input, "Ok for " + msg);
+                    return t.deepEqual(getErroneousValue(createErroneousMonad(input)), input, "Ok for " + msg);
                 };
                 testInput("foo", "Strings");
                 testInput(123, "Numbers");
@@ -96,7 +108,7 @@ var _either = require("./either");
         test: function test(_test5) {
             return _test5(function (t) {
                 var testInput = function testInput(input, msg) {
-                    return t.deepEqual((0, _either.getSuccessfulValue)((0, _either.createSuccessfulMonad)(input)), input, "Ok for " + msg);
+                    return t.deepEqual(getSuccessfulValue(createSuccessfulMonad(input)), input, "Ok for " + msg);
                 };
                 testInput("foo", "Strings");
                 testInput(123, "Numbers");
@@ -119,7 +131,7 @@ var _either = require("./either");
         test: function test(_test6) {
             return _test6(function (t) {
                 var testInput = function testInput(input, msg) {
-                    return t.deepEqual((0, _either.isInErrorState)((0, _either.createSuccessfulMonad)(input)), false, "Ok for " + msg);
+                    return t.deepEqual(isInErrorState(createSuccessfulMonad(input)), false, "Ok for " + msg);
                 };
                 testInput("foo", "Strings");
                 testInput(123, "Numbers");
@@ -144,7 +156,7 @@ var _either = require("./either");
         test: function test(_test7) {
             return _test7(function (t) {
                 var testInput = function testInput(input, msg) {
-                    return t.deepEqual((0, _either.isInErrorState)((0, _either.createErroneousMonad)(input)), true, "Ok for " + msg);
+                    return t.deepEqual(isInErrorState(createErroneousMonad(input)), true, "Ok for " + msg);
                 };
                 testInput(new Error("DERP"), "Errors");
                 testInput({
@@ -162,9 +174,9 @@ var _either = require("./either");
         should: "return a String stating the Monad is an Either(Right)",
         test: function test(_test8) {
             return _test8(function (t) {
-                var either = (0, _either.createSuccessfulMonad)("foo");
-                t.equal((0, _either.toString)(either).includes("Either"), true, "it states that given input is an Either");
-                t.equal((0, _either.toString)(either).includes("Right"), true, "it states that given input is an Either(Right)");
+                var either = createSuccessfulMonad("foo");
+                t.equal(toString(either).includes("Either"), true, "it states that given input is an Either");
+                t.equal(toString(either).includes("Right"), true, "it states that given input is an Either(Right)");
                 t.end();
             });
         }
@@ -173,9 +185,9 @@ var _either = require("./either");
         should: "return a String stating the Monad is an Either(Left)",
         test: function test(_test9) {
             return _test9(function (t) {
-                var either = (0, _either.createErroneousMonad)("foo");
-                t.equal((0, _either.toString)(either).includes("Either"), true, "it states that given input is an Either");
-                t.equal((0, _either.toString)(either).includes("Left"), true, "it states that given input is an Either(Left)");
+                var either = createErroneousMonad("foo");
+                t.equal(toString(either).includes("Either"), true, "it states that given input is an Either");
+                t.equal(toString(either).includes("Left"), true, "it states that given input is an Either(Left)");
                 t.end();
             });
         }

@@ -3,7 +3,6 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.toString = exports.isInErrorState = exports.getSuccessfulValue = exports.getErroneousValue = exports.createSuccessfulMonad = exports.createErroneousMonad = undefined;
 
 var _fp = require("lodash/fp");
 
@@ -38,10 +37,12 @@ function toString(monad) {
     return "Maybe(Something(" + getSuccessfulValue(monad) + "))";
 }
 
-exports.createErroneousMonad = createErroneousMonad;
-exports.createSuccessfulMonad = createSuccessfulMonad;
-exports.getErroneousValue = getErroneousValue;
-exports.getSuccessfulValue = getSuccessfulValue;
-exports.isInErrorState = isInErrorState;
-exports.toString = toString;
+exports.default = {
+    createErroneousMonad: createErroneousMonad,
+    createSuccessfulMonad: createSuccessfulMonad,
+    getErroneousValue: getErroneousValue,
+    getSuccessfulValue: getSuccessfulValue,
+    isInErrorState: isInErrorState,
+    toString: toString
+};
 //# sourceMappingURL=maybe.js.map
