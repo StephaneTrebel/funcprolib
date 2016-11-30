@@ -31,14 +31,14 @@ const myMaybe = maybeFlow(
     fn2,
     ...
     fnN
-)[.orElse(fnErr)](myStartingValue)
+)[.chain(fnErr)](myStartingValue)
 
 const myEither = eitherFlow(
     fn1,
     fn2,
     ...
     fnN
-)[.ifLeft(fnErr)](myStartingValue)
+)[.chain(fnErr)](myStartingValue)
 ```
 
 ## API
@@ -84,7 +84,7 @@ myFlow({
 // => Maybe(Nothing)
 ```
 
-But, like me and any other sane coder, you want to do something in case the flow failed and you end up with a Maybe(Nothing), So you can chain your flow with `orElse` which will have the double advantage of letting you:
+But, like me and any other sane coder, you want to do something in case the flow failed and you end up with a Maybe(Nothing), So you can chain your flow with `chain` which will have the double advantage of letting you:
 
 - Invoke a callback in case something went wrong
 - Unwrap the resulting value out of the Maybe monad if everything went right
@@ -97,14 +97,14 @@ myFlow({
             qux: "Hello !"
         }
     }
-}).orElse(() => console.log("Ouch !"));
+}).chain(() => console.log("Ouch !"));
 // => Hello !
 
 myFlow({
     foo: {
         oups: ":3"
     }
-}).orElse(() => console.log("Ouch !"));
+}).chain(() => console.log("Ouch !"));
 // => Ouch !
 ```
 
@@ -161,7 +161,7 @@ myFlow({
 // => Either(Left("Reference Error: bar is not defined"))
 ```
 
-But, like me and any other sane coder, you want to do something in case the flow failed and you end up with a Either(Left()), So you can chain your flow with `ifLeft` which will have the double advantage of letting you:
+But, like me and any other sane coder, you want to do something in case the flow failed and you end up with a Either(Left()), So you can chain your flow with `chain` which will have the double advantage of letting you:
 
 - Invoke a callback in case something went wrong, and you ended up with
   a Left(). The callback will be call with the Left() value so that you can act
@@ -176,14 +176,14 @@ myFlow({
             qux: "Hello !"
         }
     }
-}).ifLeft(() => console.log("Ouch !"));
+}).chain(() => console.log("Ouch !"));
 // => "Hello !"
 
 myFlow({
     foo: {
         oups: ":3"
     }
-}).ifLeft((e) => console.log(`Ouch ! ${e.toString()}`));
+}).chain((e) => console.log(`Ouch ! ${e.toString()}`));
 // => "Ouch ! Reference Error: bar is not defined"
 ```
 
