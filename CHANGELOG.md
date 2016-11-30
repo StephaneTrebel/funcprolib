@@ -4,6 +4,9 @@ Normal priority:
 
 [NEXT VERSION]
 
+[2.0.1]
+- Fix documentation for "chain"
+
 [2.0.0]
 - Fix internal exports definitions
 - Rename "ifLeft" and "ifNothing" to the generic "chain"
