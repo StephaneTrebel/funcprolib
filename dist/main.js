@@ -127,7 +127,7 @@ flow.debug = function (monadDefinition) {
             return fns.reduce(function (prev, curr) {
                 var debug = "FuncProLib Debug - ";
                 var temp = prev.map(curr);
-                if (prev.chain()) {
+                if (monadDefinition.isInErrorState(prev)) {
                     console.log(debug + "Monad is in an erroneous state. Bypassing ", curr.toString().split("\n")[0]);
                 } else {
                     functionCall = functionCall + 1;

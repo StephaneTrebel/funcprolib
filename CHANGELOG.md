@@ -4,6 +4,9 @@ Normal priority:
 
 [NEXT VERSION]
 
+[2.0.2]
+- Fix erroneous state monad detection in flow.debug
+
 [2.0.1]
 - Fix documentation for "chain"
 
