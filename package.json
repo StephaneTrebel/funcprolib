@@ -36,7 +36,7 @@
         "faucet": "~0.0.1",
         "jsdoc": "~3.4.3",
         "jslint": "stephanetrebel/node-jslint",
-        "nyc": "~9.0.1",
+        "nyc": "~10.0.0",
         "semtest": "2.0.1",
         "semtest-e2e": "2.0.1",
         "tape": "~4.6.2"
